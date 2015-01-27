@@ -197,7 +197,8 @@
         
         _editortRightButton = [UIButton buttonWithType:UIButtonTypeSystem];
         _editortRightButton.translatesAutoresizingMaskIntoConstraints = NO;
-        _editortRightButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentRight;
+        // Align text in center of button
+        _editortRightButton.contentHorizontalAlignment = UIControlContentHorizontalAlignmentCenter;
         _editortRightButton.titleLabel.font = [UIFont boldSystemFontOfSize:15.0];
         _editortRightButton.enabled = NO;
         [_editortRightButton setTitle:NSLocalizedString(@"Save", nil) forState:UIControlStateNormal];
@@ -260,8 +261,10 @@
 
 - (CGFloat)appropriateRightButtonWidth
 {
-    NSString *title = [self.rightButton titleForState:UIControlStateNormal];
-    CGSize rigthButtonSize = [title sizeWithAttributes:@{NSFontAttributeName: self.rightButton.titleLabel.font}];
+//    NSString *title = [self.rightButton titleForState:UIControlStateNormal];
+//    CGSize rigthButtonSize = [title sizeWithAttributes:@{NSFontAttributeName: self.rightButton.titleLabel.font}];
+    // Use intrinsic size so content insets are accounted for
+    CGSize rigthButtonSize = [self.rightButton intrinsicContentSize];
     
     if (self.autoHideRightButton) {
         if (self.textView.text.length == 0) {
@@ -512,13 +515,17 @@
                               @"minTextViewHeight" : @(self.textView.intrinsicContentSize.height),
                               };
 
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(left)-[leftButton(0)]-(<=left)-[textView]-(right)-[rightButton(0)]-(right)-|" options:0 metrics:metrics views:views]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[leftButton(0)]-(0@750)-|" options:0 metrics:metrics views:views]];
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=rightVerMargin)-[rightButton]-(<=rightVerMargin)-|" options:0 metrics:metrics views:views]];
+    // Improved constraints to not allow top collapse
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(left)-[leftButton(0)]-(<=left)-[textView]-(right)-[rightButton(0)]-(right)-|"
+                                                                 options:NSLayoutFormatAlignAllBottom
+                                                                 metrics:metrics
+                                                                   views:views]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=0)-[leftButton(0)]" options:0 metrics:metrics views:views]];
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(>=rightVerMargin)-[rightButton(minTextViewHeight@250)]" options:0 metrics:metrics views:views]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-(<=top)-[charCountLabel]-(>=0)-|" options:0 metrics:metrics views:views]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|-(left@250)-[charCountLabel(<=50@1000)]-(right@750)-|" options:0 metrics:metrics views:views]];
-
-    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[accessoryView(0)]-(<=top)-[textView(minTextViewHeight@250)]-(bottom)-|" options:0 metrics:metrics views:views]];
+    
+    [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"V:|-0-[accessoryView(0)]-(<=top,==top@999)-[textView(minTextViewHeight@250)]-(<=bottom,==bottom@999)-|" options:0 metrics:metrics views:views]];
     [self addConstraints:[NSLayoutConstraint constraintsWithVisualFormat:@"H:|[accessoryView]|" options:0 metrics:metrics views:views]];
     
     self.accessoryViewHC = [self slk_constraintForAttribute:NSLayoutAttributeHeight firstItem:self.accessoryView secondItem:nil];
