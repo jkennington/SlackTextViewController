@@ -353,7 +353,7 @@ NSString * const SLKKeyboardDidHideNotification =   @"SLKKeyboardDidHideNotifica
         return nil;
     }
     
-    SLKInputAccessoryView *view = [[SLKInputAccessoryView alloc] initWithFrame:self.textInputbar.bounds];
+    SLKInputAccessoryView *view = [[SLKInputAccessoryView alloc] initWithFrame:CGRectZero];
     view.backgroundColor = [UIColor clearColor];
     view.userInteractionEnabled = NO;
     
